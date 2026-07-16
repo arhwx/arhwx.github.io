@@ -35,6 +35,9 @@ const CITIES = [
   { en: "Chamchamal", ku: "چەمچەماڵ", lat: 35.53, lng: 44.83 },
   { en: "Ranya", ku: "ڕانیە", lat: 36.25, lng: 44.88 },
   { en: "Kalar", ku: "کەلار", lat: 34.63, lng: 45.32 },
+  { en: "Umm Qasr", ku: "ئوم قەسر", lat: 30.03, lng: 47.93 },
+  { en: "Qurnah", ku: "قورنە", lat: 31.02, lng: 47.43 },
+  { en: "Rumaila", ku: "ڕومەیلە", lat: 30.6, lng: 47.25 },
 ];
 const CITY_RADIUS_KM = 45;
 
@@ -249,16 +252,33 @@ bindToggle("branchBtn", "branch");
 
 const panel = document.getElementById("banksPanel");
 const citiesPanel = document.getElementById("citiesPanel");
+
+function updateFade(el) {
+  const end = el.scrollTop + el.clientHeight >= el.scrollHeight - 4;
+  el.classList.toggle("at-end", end);
+}
+panel.addEventListener("scroll", () => updateFade(panel));
+citiesPanel.addEventListener("scroll", () => updateFade(citiesPanel));
+
 document.getElementById("banksBtn").onclick = () => {
   citiesPanel.classList.remove("open");
   panel.classList.toggle("open");
+  updateFade(panel);
 };
 document.getElementById("closeBanks").onclick = () => panel.classList.remove("open");
 document.getElementById("citiesBtn").onclick = () => {
   panel.classList.remove("open");
   citiesPanel.classList.toggle("open");
+  updateFade(citiesPanel);
 };
 document.getElementById("closeCities").onclick = () => citiesPanel.classList.remove("open");
+
+const notice = document.getElementById("notice");
+if (!localStorage.getItem("noticeOk")) notice.hidden = false;
+document.getElementById("noticeOk").onclick = () => {
+  localStorage.setItem("noticeOk", "1");
+  notice.hidden = true;
+};
 
 let meMarker = null;
 document.getElementById("locateBtn").onclick = () => {

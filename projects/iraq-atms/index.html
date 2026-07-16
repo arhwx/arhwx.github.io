@@ -76,6 +76,23 @@ body { overflow: hidden; }
   display: none;
 }
 .banks-panel.open { display: block; }
+.banks-panel {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-soft) transparent;
+}
+.banks-panel::-webkit-scrollbar { width: 6px; }
+.banks-panel::-webkit-scrollbar-thumb { background: var(--ink-soft); border-radius: 3px; }
+.banks-panel::after {
+  content: "";
+  position: sticky;
+  bottom: -0.9rem;
+  display: block;
+  height: 2.4rem;
+  margin-top: -2.4rem;
+  background: linear-gradient(to bottom, rgba(18, 20, 24, 0), var(--bg) 80%);
+  pointer-events: none;
+}
+.banks-panel.at-end::after { opacity: 0; }
 .banks-panel h2 {
   font-family: var(--mono);
   font-size: 0.85rem;
@@ -146,6 +163,37 @@ body { overflow: hidden; }
   .map-bar { gap: 0.35rem; padding-left: 0.45rem; padding-right: 0.45rem; }
   .map-bar button { font-size: 0.85rem; gap: 0.25rem; }
 }
+.notice-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(10, 11, 14, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.notice-overlay[hidden] { display: none; }
+.notice-card {
+  background: var(--bg);
+  border: 1px solid var(--ink-soft);
+  border-radius: 12px;
+  max-width: 24rem;
+  padding: 1.2rem 1.3rem;
+}
+.notice-card p { margin: 0 0 0.9rem; font-size: 1rem; line-height: 1.6; }
+.notice-card button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--mark);
+  color: #16181d;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 .branch-marker {
   background: #d6382b;
   border: 2px solid #ffffff;
@@ -192,6 +240,13 @@ body { overflow: hidden; }
 
 <div class="map-body">
   <div id="map"></div>
+  <div class="notice-overlay" id="notice" hidden>
+    <div class="notice-card">
+      <p dir="rtl" lang="ckb">شوێنی ئەی تی ئێم و لقەکان لە ماڵپەڕە گشتییەکانی بانکەکانەوە وەرگیراون. لەوانەیە هەندێکیان هەڵە یان کۆن بن، بەرپرسیارێتی دروستی زانیارییەکان لەسەر بانکەکانە.</p>
+      <p dir="ltr" lang="en">ATM and branch locations come from the banks' public websites. Some may be wrong or outdated, the accuracy of the data is the banks' responsibility. This site is not affiliated with any bank.</p>
+      <button id="noticeOk">باشە · OK</button>
+    </div>
+  </div>
   <div class="banks-panel" id="banksPanel">
     <h2><span dir="rtl">بانکەکان</span>
       <button class="toggle" id="all">هەموو</button>
