@@ -16,6 +16,9 @@ const CITIES = [
   { en: "Ramadi", ku: "ڕەمادی", lat: 33.42, lng: 43.3 },
   { en: "Fallujah", ku: "فەللوجە", lat: 33.35, lng: 43.78 },
   { en: "Halabja", ku: "هەڵەبجە", lat: 35.18, lng: 45.99 },
+  { en: "Sharazoor", ku: "شارەزوور", lat: 35.315, lng: 45.685 },
+  { en: "Sayid Sadiq", ku: "سەیدسادق", lat: 35.35, lng: 45.86 },
+  { en: "Darbandikhan", ku: "دەربەندیخان", lat: 35.11, lng: 45.69 },
   { en: "Nasiriyah", ku: "ناسریە", lat: 31.05, lng: 46.26 },
   { en: "Amarah", ku: "عەمارە", lat: 31.84, lng: 47.14 },
   { en: "Diwaniyah", ku: "دیوانیە", lat: 31.99, lng: 44.92 },
@@ -83,11 +86,7 @@ function distKm(lat1, lng1, lat2, lng2) {
 }
 
 function assignCities() {
-  for (const c of CITIES) {
-    c.count = 0;
-    c.lats = [];
-    c.lngs = [];
-  }
+  for (const c of CITIES) c.count = 0;
   for (const s of sites) {
     let best = null;
     let bestD = CITY_RADIUS_KM;
@@ -98,18 +97,8 @@ function assignCities() {
         bestD = d;
       }
     }
-    if (best) {
-      best.count++;
-      best.lats.push(+s.latitude);
-      best.lngs.push(+s.longitude);
-    }
+    if (best) best.count++;
   }
-}
-
-function median(arr) {
-  const a = [...arr].sort((x, y) => x - y);
-  const mid = Math.floor(a.length / 2);
-  return a.length % 2 ? a[mid] : (a[mid - 1] + a[mid]) / 2;
 }
 
 function renderCityList() {
@@ -131,7 +120,7 @@ function renderCityList() {
     btn.appendChild(n);
     btn.onclick = () => {
       citiesPanel.classList.remove("open");
-      map.setView([median(c.lats), median(c.lngs)], 13);
+      map.setView([c.lat, c.lng], 13);
     };
     el.appendChild(btn);
   }
