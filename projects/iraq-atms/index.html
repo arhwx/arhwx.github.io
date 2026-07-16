@@ -3,13 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>iraq atm map - arhwx</title>
+<title>Iraq ATM map - arhwx</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="/assets/site.css">
 <style>
 body { overflow: hidden; }
-.map-page { display: grid; grid-template-rows: auto 1fr auto; height: 100dvh; }
+.map-page { display: grid; grid-template-rows: auto auto 1fr auto; height: 100dvh; }
+.disclaimer {
+  padding: 0.35rem 0.9rem;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.disclaimer p { margin: 0; }
 .map-top {
   display: flex;
   align-items: center;
@@ -172,9 +181,14 @@ body { overflow: hidden; }
 
 <nav class="map-top">
   <a class="back" href="/projects/">&#8592; back</a>
-  <span class="title">iraq atm map</span>
+  <span class="title">Iraq ATM map</span>
   <span class="count" id="count"></span>
 </nav>
+
+<div class="disclaimer">
+  <p dir="rtl" lang="ckb">زانیارییەکان لە ماڵپەڕە گشتییەکانی بانکەکانەوە کۆکراونەتەوە و لەوانەیە کۆن بن.</p>
+  <p dir="ltr" lang="en">Data collected from the banks' public websites and may be outdated. This site is not affiliated with any bank.</p>
+</div>
 
 <div class="map-body">
   <div id="map"></div>
