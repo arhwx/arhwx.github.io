@@ -1,0 +1,95 @@
+:root {
+  --bg: #121418;
+  --bg-raised: #1a1d23;
+  --ink: #e8eae6;
+  --ink-soft: #9aa0a8;
+  --rule: #2a2d33;
+  --mark: #ffe33d;
+  --link: #8ba3ff;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: var(--sans);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1.1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+
+.site-nav .wordmark {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.site-nav a:not(.wordmark) {
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 0.1rem 0.25rem;
+}
+
+.site-nav a[aria-current="page"],
+.site-nav a:hover:not(.wordmark) {
+  color: #16181d;
+  background: var(--mark);
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 2.5rem 0 0.5rem;
+}
+
+a { color: var(--link); }
+
+p.muted { color: var(--ink-soft); }
+
+ul.plain { list-style: none; padding: 0; }
+ul.plain li { padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
+ul.plain a { font-size: 1.05rem; }
+ul.plain .note { color: var(--ink-soft); font-size: 0.9rem; }
+
+ul.cards { list-style: none; padding: 0; display: grid; gap: 1rem; }
+ul.cards a.card {
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  padding: 1rem 1.2rem;
+  text-decoration: none;
+}
+ul.cards a.card:hover { border-color: var(--ink-soft); }
+ul.cards .card h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--ink); }
+ul.cards .card .note { color: var(--ink-soft); font-size: 0.9rem; }
+
+.back {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.back:hover { color: #16181d; background: var(--mark); }
+
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }

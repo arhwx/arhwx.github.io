@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iraq atm map - arhwx</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+body { overflow: hidden; }
+.map-page { display: grid; grid-template-rows: auto 1fr auto; height: 100dvh; }
+.map-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+.map-top .title { color: var(--ink); }
+.map-top .count { margin-left: auto; color: var(--ink-soft); font-size: 0.8rem; }
+.map-body { position: relative; }
+#map { position: absolute; inset: 0; background: #0e1013; }
+.map-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--rule);
+}
+.map-bar button {
+  flex: 1;
+  min-height: 46px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--bg-raised);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.map-bar button .dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.map-bar button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-soft); background: #232730; }
+.map-bar button:active { transform: scale(0.98); }
+.banks-panel {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  max-width: 22rem;
+  margin: 0 auto;
+  max-height: 55%;
+  overflow-y: auto;
+  z-index: 1000;
+  background: var(--bg);
+  border: 1px solid var(--ink-soft);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem 0.9rem;
+  display: none;
+}
+.banks-panel.open { display: block; }
+.banks-panel h2 {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  margin: 0.3rem 0 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.banks-panel .toggle {
+  border: 1px solid var(--ink-soft);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+.banks-panel .toggle:hover { border-color: var(--ink); background: #232730; }
+.banks-panel h2 .close { margin-left: auto; }
+.lang-switch { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+.lang-switch button {
+  flex: 1;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+  cursor: pointer;
+}
+.lang-switch button[aria-pressed="true"] {
+  color: #16181d;
+  background: var(--mark);
+  border-color: var(--mark);
+}
+.banks-panel label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--rule);
+}
+.banks-panel label:last-child { border-bottom: 0; }
+.banks-panel input { width: 1.15rem; height: 1.15rem; accent-color: var(--mark); }
+.banks-panel .n { margin-left: auto; color: var(--ink-soft); font-family: var(--mono); font-size: 0.8rem; }
+.banks-panel .city-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.55rem 0.1rem;
+  cursor: pointer;
+  text-align: left;
+}
+.banks-panel .city-row:hover { background: var(--bg-raised); }
+.banks-panel .city-row:last-child { border-bottom: 0; }
+@media (max-width: 640px) {
+  .map-bar { gap: 0.35rem; padding-left: 0.45rem; padding-right: 0.45rem; }
+  .map-bar button { font-size: 0.85rem; gap: 0.25rem; }
+}
+.branch-marker {
+  background: #d6382b;
+  border: 2px solid #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+.leaflet-popup-content-wrapper { border-radius: 10px; }
+.leaflet-popup-content { font-family: var(--sans); font-size: 1rem; line-height: 1.5; margin: 0.8rem 1rem; min-width: 200px; }
+.leaflet-popup-content .name { font-weight: 600; font-size: 1.05rem; display: block; }
+.leaflet-popup-content .name[dir="rtl"] { text-align: right; }
+.leaflet-popup-content .kind { font-size: 0.8rem; color: #5b616b; }
+.leaflet-popup-content .banks { font-size: 0.85rem; color: #3a3f47; margin: 0.25rem 0 0.6rem; }
+.dir-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 46px;
+  border-radius: 8px;
+  background: #1a73e8;
+  color: #fff !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+@media (max-width: 640px) {
+  .map-top .count { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="map-page">
+
+<nav class="map-top">
+  <a class="back" href="/projects/">&#8592; back</a>
+  <span class="title">iraq atm map</span>
+  <span class="count" id="count"></span>
+</nav>
+
+<div class="map-body">
+  <div id="map"></div>
+  <div class="banks-panel" id="banksPanel">
+    <h2><span dir="rtl">بانکەکان</span>
+      <button class="toggle" id="all">هەموو</button>
+      <button class="toggle" id="none">هیچ</button>
+      <button class="toggle close" id="closeBanks">&#10005;</button>
+    </h2>
+    <div class="lang-switch">
+      <button id="langKu" aria-pressed="true">کوردی</button>
+      <button id="langEn" aria-pressed="false">English</button>
+    </div>
+    <div id="banks"></div>
+  </div>
+  <div class="banks-panel" id="citiesPanel">
+    <h2><span dir="rtl">شارەکان</span>
+      <button class="toggle close" id="closeCities">&#10005;</button>
+    </h2>
+    <div id="cities"></div>
+  </div>
+</div>
+
+<div class="map-bar">
+  <button id="atmBtn" aria-pressed="true"><span class="dot" style="background:#2946c8"></span>&#127975; ATM</button>
+  <button id="branchBtn" aria-pressed="true"><span class="dot" style="background:#d6382b;border-radius:3px"></span>&#127974; <span dir="rtl">لق</span></button>
+  <button id="citiesBtn"><span dir="rtl">شارەکان</span></button>
+  <button id="banksBtn"><span dir="rtl">بانکەکان</span></button>
+  <button id="locateBtn">&#128205; <span dir="rtl">نزیک من</span></button>
+</div>
+
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/assets/map.js"></script>
+</body>
+</html>
