@@ -1,0 +1,44 @@
+{
+  "school": "Example School",
+  "term": "2026-2027",
+  "days": [true, true, true, true, true, false, false],
+  "periods": 6,
+  "dayStart": "08:30",
+  "lessonMin": 40,
+  "breaks": [
+    { "id": 11, "after": 2, "label": "break", "min": 20 },
+    { "id": 12, "after": 4, "label": "lunch", "min": 40 }
+  ],
+  "subjects": [
+    { "id": 1, "name": "Maths", "color": 0 },
+    { "id": 2, "name": "English", "color": 1 },
+    { "id": 3, "name": "Science", "color": 2 },
+    { "id": 4, "name": "History", "color": 3 },
+    { "id": 5, "name": "Art", "color": 4 },
+    { "id": 6, "name": "PE", "color": 5 }
+  ],
+  "teachers": [
+    { "id": 7, "name": "Teacher A", "maxPerDay": 0, "off": {} },
+    { "id": 8, "name": "Teacher B", "maxPerDay": 0, "off": { "0-0": 1, "0-1": 1, "0-2": 1, "0-3": 1, "0-4": 1, "0-5": 1 } },
+    { "id": 9, "name": "Teacher C", "maxPerDay": 0, "off": {} },
+    { "id": 10, "name": "Teacher D", "maxPerDay": 0, "off": {} }
+  ],
+  "classes": [
+    { "id": 20, "name": "1A", "lessons": [
+      { "id": 21, "s": 1, "t": 7, "n": 6, "m": 0, "pr": "h" },
+      { "id": 22, "s": 2, "t": 8, "n": 6, "m": 0, "pr": "h" },
+      { "id": 23, "s": 3, "t": 9, "n": 5, "m": 0, "pr": "n" },
+      { "id": 24, "s": 4, "t": 10, "n": 5, "m": 0, "pr": "n" },
+      { "id": 25, "s": 5, "t": 9, "n": 4, "m": 0, "pr": "l" },
+      { "id": 26, "s": 6, "t": 10, "n": 4, "m": 0, "pr": "n" }
+    ]},
+    { "id": 30, "name": "1B", "lessons": [
+      { "id": 31, "s": 1, "t": 7, "n": 6, "m": 0, "pr": "h" },
+      { "id": 32, "s": 2, "t": 8, "n": 6, "m": 0, "pr": "h" },
+      { "id": 33, "s": 3, "t": 9, "n": 5, "m": 0, "pr": "n" },
+      { "id": 34, "s": 4, "t": 10, "n": 5, "m": 0, "pr": "n" },
+      { "id": 35, "s": 5, "t": 9, "n": 4, "m": 0, "pr": "l" },
+      { "id": 36, "s": 6, "t": 10, "n": 4, "m": 0, "pr": "n" }
+    ]}
+  ]
+}
