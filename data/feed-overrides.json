@@ -1,0 +1,22 @@
+{
+  "/projects/iraq-atms/": {
+    "note": "every Iraqi bank's ATMs and branches on one map"
+  },
+  "/projects/timetable/": {
+    "note": "the tool my school uses to build its weekly timetables"
+  },
+  "https://github.com/arhwx/libcrunch": {
+    "note": "RFC 8878 compliant Zstandard decoder written from scratch in C++"
+  },
+  "https://github.com/arhwx/metawrap": {
+    "note": "C++26 static reflection without the boilerplate"
+  },
+  "https://github.com/llvm/llvm-project/pull/208923": {
+    "title": "clang crash fix merged into LLVM",
+    "note": "constant evaluation crashed on subobject access through _Atomic"
+  },
+  "https://github.com/radareorg/radare2/pull/26210": {
+    "title": "radare2 fix merged",
+    "note": "oba was not loading bin info from fat Mach-O headers"
+  }
+}
