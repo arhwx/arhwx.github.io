@@ -18,7 +18,37 @@
   <a href="https://github.com/arhwx">github</a>
 </nav>
 
-<h1>arhwx</h1>
+<h2>about me</h2>
+<p>I write low level code, mostly C++, with some C and Rust. I like the parts
+where software meets hardware, things like compilers, binary formats, and
+virtualization, and I like taking programs apart to see what they really do.
+Some of it ends up on the <a href="/blog/">blog</a>.</p>
+
+<h2>recent</h2>
+<ul class="plain" id="recent"></ul>
+<noscript><p class="muted">the recent list needs JavaScript; see
+<a href="/projects/">projects</a> and <a href="/blog/">blog</a> instead.</p></noscript>
+
+<script>
+fetch('/data/feed.json').then(r => r.json()).then(items => {
+  items.sort((a, b) => b.date.localeCompare(a.date));
+  const ul = document.getElementById('recent');
+  for (const item of items.slice(0, 6)) {
+    const li = document.createElement('li');
+    const date = document.createElement('span');
+    date.className = 'date';
+    date.textContent = item.date;
+    const link = document.createElement('a');
+    link.href = item.url;
+    link.textContent = item.title;
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = item.note;
+    li.append(date, link, note);
+    ul.append(li);
+  }
+});
+</script>
 
 </div>
 </body>
