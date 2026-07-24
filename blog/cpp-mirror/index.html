@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C++ finally gets a mirror - arhwx</title>
+<meta name="description" content="what C++26 static reflection feels like to use today">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<div class="page">
+
+<nav class="site-nav">
+  <a class="wordmark" href="/">arhwx</a>
+  <a href="/">index</a>
+  <a href="/projects/">projects</a>
+  <a href="/blog/" aria-current="page">blog</a>
+  <a href="https://github.com/arhwx">github</a>
+</nav>
+
+<h1>C++ finally gets a mirror</h1>
+<p class="muted">July 2026</p>
+
+<p>For as long as C++ has existed, a program couldn't look at its own types.
+Given a plain struct, there was no way to ask what fields it has, and
+something as simple as printing an enum's name meant keeping a table by hand
+or generating code with macros nobody enjoys reading. Most other languages
+grew some way for code to see itself a long time ago, and C++ kept not having
+one. C++26 changes that with static reflection. Since compiler support is
+still settling, I've been using a pinned build of clang to find out what it
+feels like in practice, and I've collected what I built into
+<a href="https://github.com/arhwx/metawrap">metawrap</a>, a small library on
+top of the new API. This post is a tour of the parts I actually use.</p>
+
+<h2>the new syntax</h2>
+
+<p>Reflection adds two operators and a loop. The first operator is
+<code>^^</code>, which lifts a type (or a member, or an enumerator) into an
+ordinary value of type <code>std::meta::info</code> that you can pass around
+and compute with at compile time. Here is how metawrap gets the field list of
+a struct:</p>
+
+<pre><code class="language-cpp">template &lt;typename T&gt; consteval auto fields_of() {
+  return std::define_static_array(std::meta::nonstatic_data_members_of(
+      ^^std::remove_cvref_t&lt;T&gt;, std::meta::access_context::current()));
+}</code></pre>
+
+<p><code>nonstatic_data_members_of</code> does what it says, and it takes an
+access context because what you're allowed to see depends on where you're
+asking from. <code>define_static_array</code> gives the resulting list static
+storage so it can be walked later, still at compile time.</p>
+
+<p>The second operator goes the other way. <code>[:member:]</code> is called
+a splice, and it turns a reflection value back into real code. Combined with
+<code>template for</code>, which expands its body once per element at compile
+time, you can visit every field of any struct:</p>
+
+<pre><code class="language-cpp">template &lt;typename T, typename F&gt;
+constexpr void for_each_field(T &amp;&amp;obj, F &amp;&amp;fn) {
+  template for (constexpr auto member : fields_of&lt;T&gt;()) {
+    fn(std::meta::identifier_of(member), obj.[:member:]);
+  }
+}</code></pre>
+
+<p>Each expansion of the loop body is its own piece of code, so
+<code>obj.[:member:]</code> has the actual type of that field, and the lambda
+you pass in gets the field's name and a reference to its value. That one
+function is most of the library. Everything else is applications of it.</p>
+
+<h2>enums learn their own names</h2>
+
+<p>The enum version of the same idea is the feature I'd wanted longest.
+This is the whole implementation of enum to string:</p>
+
+<pre><code class="language-cpp">template &lt;typename E&gt;
+  requires std::is_enum_v&lt;E&gt;
+constexpr std::string_view enum_to_string(E value) {
+  template for (constexpr auto e : enumerators_of&lt;E&gt;()) {
+    if (value == [:e:])
+      return std::meta::identifier_of(e);
+  }
+  return {};
+}</code></pre>
+
+<p>No macro, no generator, no table that drifts out of sync when someone adds
+an enumerator. <code>mw::enum_to_string(LogLevel::warning)</code> returns
+<code>"warning"</code>, and the reverse direction is the same loop comparing
+names instead of values.</p>
+
+<h2>a struct that prints itself</h2>
+
+<p>Put field iteration and enum names together and you get the thing C++
+programmers have been writing by hand forever. metawrap has a
+<code>struct_formatter</code> that plugs any struct into
+<code>std::format</code> with one line:</p>
+
+<pre><code class="language-cpp">struct ServerConfig {
+  std::string host;
+  int port;
+  LogLevel log_level;
+  bool tls;
+};
+
+template &lt;&gt;
+struct std::formatter&lt;ServerConfig&gt; : mw::struct_formatter&lt;ServerConfig&gt; {};
+
+ServerConfig config{"localhost", 8080, LogLevel::info, true};
+std::println("{}", config);
+std::println("{:k}", config);</code></pre>
+
+<p>which prints:</p>
+
+<pre><code class="nohighlight">{ "localhost", 8080, info, true }
+{ host: "localhost", port: 8080, log_level: info, tls: true }</code></pre>
+
+<p>The formatter walks the fields, quotes the strings, and looks up enum
+names with the function above. The format spec letters are mine
+(<code>k</code> for keys, <code>t</code> for the type name, <code>p</code>
+for pretty printing), and adding one is a case in a switch.</p>
+
+<h2>running it today</h2>
+
+<p>The catch is the toolchain. Reflection made it into C++26 in 2025 but no
+released compiler ships it yet, gcc trunk covers most of it, upstream clang
+covers less, and the fullest implementation is still
+<a href="https://github.com/bloomberg/clang-p2996">clang-p2996</a>, the
+experimental fork that tracks the proposal. That fork is what metawrap pins
+in its Dockerfile, and a build looks like this:</p>
+
+<pre><code class="nohighlight">clang++ -std=c++26 -freflection-latest -stdlib=libc++ -Iinclude examples/fields.cpp</code></pre>
+
+<p>The flag says latest because the implementation is still moving, so
+whatever compiles this month might need touching up next month. I wouldn't
+put it near production, but for playing with what's coming it works today,
+and the <a href="https://github.com/arhwx/metawrap">examples directory</a>
+has a small runnable file per feature.</p>
+
+<p>C++ took its time with this one, but now that it's here I don't plan on
+writing another enum table by hand. Structs in the mirror are closer than
+they appear.</p>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
