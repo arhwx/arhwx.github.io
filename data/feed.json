@@ -1,6 +1,12 @@
 [
   {
     "date": "2026-07-24",
+    "title": "C++ finally gets a mirror",
+    "url": "/blog/cpp-mirror/",
+    "note": "what C++26 static reflection feels like to use today"
+  },
+  {
+    "date": "2026-07-24",
     "title": "metawrap",
     "url": "https://github.com/arhwx/metawrap",
     "note": "C++26 static reflection without the boilerplate"
